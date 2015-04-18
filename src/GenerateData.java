@@ -5,4 +5,7 @@ public class GenerateData {
     /*
     Esta clase genera los datos para crear los rectangulos
      */
+    public void generatePoints(){
+
+    }
 }

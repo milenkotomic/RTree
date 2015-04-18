@@ -36,4 +36,15 @@ public class Punto {
     public double distance(Punto p){
         return sqrt(pow(this.getX() - p.getX(), 2) + pow(this.getY() - p.getY(), 2));
     }
+
+    @Override
+    public boolean equals(Object obj){
+        if(!(obj instanceof Punto)){
+            return false;
+        }
+        else{
+            Punto punto = (Punto) obj;
+            return (this.getX()==punto.getX() && this.getY()==punto.getY());
+        }
+    }
 }

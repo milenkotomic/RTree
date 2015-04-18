@@ -39,4 +39,22 @@ public class Rectangulo {
             return ancho * alto;
         return 0;
     }
+    public boolean contains(Rectangulo r){
+        /*
+        Indica si r esta dentro de este rectangulo o no
+         */
+        boolean p1_dentro=(this.p1.getX()>r.p1.getX() && this.p1.getY()>r.p1.getY());
+        boolean p2_dentro=(this.p2.getX()>r.p2.getX() && this.p2.getY()>r.p2.getY());
+        return p1_dentro && p2_dentro;
+    }
+    @Override
+    public boolean equals(Object obj){
+        if(!(obj instanceof Rectangulo)){
+            return false;
+        }
+        else{
+            Rectangulo r = (Rectangulo) obj;
+            return (this.p1.equals(r.p1) && this.p2.equals(r.p2));
+        }
+    }
 }

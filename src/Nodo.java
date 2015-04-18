@@ -13,12 +13,15 @@ public class Nodo {
         setHijos(new ArrayList<Nodo>());
     }
     public boolean isFull(){
-        return true;
+
+        return (keys.size()>2*getT());
     }
     public boolean isEmpty(){
-        return true;
+
+        return (keys.size()<t);
     }
     public boolean isLeaf(){
+
         return getHijos().isEmpty();
     }
 
