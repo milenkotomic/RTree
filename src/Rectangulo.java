@@ -13,7 +13,7 @@ public class Rectangulo {
        |          |
       p1___________*/
 
-    public Rectangulo(Punto p1, Punto p2, Punto p3, Punto p4) {
+    public Rectangulo(Punto p1, Punto p2) {
         this.p1 = p1;
         this.p2 = p2;
     }
