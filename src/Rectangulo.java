@@ -1,3 +1,5 @@
+import java.nio.ByteBuffer;
+
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -16,6 +18,19 @@ public class Rectangulo {
     public Rectangulo(Punto p1, Punto p2) {
         this.p1 = p1;
         this.p2 = p2;
+    }
+
+    public Rectangulo(byte[] buffer, int start){
+        double xP1 = ByteBuffer.wrap(buffer, start, 8).getDouble();
+        start+=8;
+        double yP1 = ByteBuffer.wrap(buffer, start, 8).getDouble();
+        start+=8;
+        double xP2 = ByteBuffer.wrap(buffer, start, 8).getDouble();
+        start+=8;
+        double yP2 = ByteBuffer.wrap(buffer, start, 8).getDouble();
+        start+=8;
+        p1 = new Punto(xP1, yP1);
+        p2 = new Punto(xP2, yP2);
     }
 
     public double area(){

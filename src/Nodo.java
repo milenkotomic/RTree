@@ -1,29 +1,29 @@
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 /**
  * Created by luism on 17-04-15.
+ *
+ * Nodo para usarse en el R-Tree guarda el maximo y minimo numero de elementos
+ * de cada nodo, la dimension del espacio, su MBR propio y los de sus hijos
+ * asi como su posicion en el archivo donde se guarda el R-Tree y las de sus hijos
+
+ * Ejemplo del formato de un Node con maximo de hijos 4 al ser guardado en disco
+ *
+ * --------------------------------------------------------------------------------------------------------------------------
+ * | t |n_child| myMBR |MyRefFile|MBR1|MBR2|MBR3|MBR4|RefFile1|RefFile2|RefFile3|RefFile4|
+ * --------------------------------------------------------------------------------------------------------------------------
+ * |4B |  4B   | 32 B  |   8B    |      4 * 32  B    |   8B   |   8B   |   8B   |    8B  |
+ *
  */
 public class Nodo {
     private int t;
+    private int nChildren;
     private ArrayList<Rectangulo> keys;
-    private ArrayList<Nodo> hijos;
-    public Nodo(int t){
-        this.setT(t);
-        setKeys(new ArrayList<Rectangulo>());
-        setHijos(new ArrayList<Nodo>());
-    }
-    public boolean isFull(){
-
-        return (keys.size()>2*getT());
-    }
-    public boolean isEmpty(){
-
-        return (keys.size()<t);
-    }
-    public boolean isLeaf(){
-
-        return getHijos().isEmpty();
-    }
+    private Rectangulo myRectangulo;
+    private ArrayList<Rectangulo> hijos;
+    private long myFilePosition;
+    private long[] childrenFilePosition;
 
     public int getT() {
         return t;
@@ -31,6 +31,14 @@ public class Nodo {
 
     public void setT(int t) {
         this.t = t;
+    }
+
+    public int getnChildren() {
+        return nChildren;
+    }
+
+    public void setnChildren(int nChildren) {
+        this.nChildren = nChildren;
     }
 
     public ArrayList<Rectangulo> getKeys() {
@@ -41,11 +49,86 @@ public class Nodo {
         this.keys = keys;
     }
 
-    public ArrayList<Nodo> getHijos() {
+    public Rectangulo getMyRectangulo() {
+        return myRectangulo;
+    }
+
+    public void setMyRectangulo(Rectangulo myRectangulo) {
+        this.myRectangulo = myRectangulo;
+    }
+
+    public Long getMyFilePosition() {
+        return myFilePosition;
+    }
+
+    public void setMyFilePosition(long myFilePosition) {
+        this.myFilePosition = myFilePosition;
+    }
+
+    public long[] getChildrenFilePosition() {
+        return childrenFilePosition;
+    }
+
+    public void setChildrenFilePosition(long[] childrenFilePosition) {
+        this.childrenFilePosition = childrenFilePosition;
+    }
+
+    public boolean isFull(){
+        return (keys.size()>2*getT());
+    }
+
+    public boolean isEmpty(){
+        return (keys.size()<t);
+    }
+
+    public boolean isLeaf(){
+
+        return getHijos().isEmpty();
+    }
+
+    public ArrayList<Rectangulo> getHijos() {
         return hijos;
     }
 
-    public void setHijos(ArrayList<Nodo> hijos) {
+    public void setHijos(ArrayList<Rectangulo> hijos) {
         this.hijos = hijos;
+    }
+
+    public void writeToBuffer(byte[] buffer) {
+    }
+
+    public Nodo(int t, long filePos){
+        setT(t);
+        setnChildren(0);
+        setKeys(new ArrayList<Rectangulo>());
+        setHijos(new ArrayList<Rectangulo>());
+        setMyFilePosition(filePos);
+        setChildrenFilePosition(new long[(2*t)+1]);
+    }
+
+    public Nodo(byte[] buffer){
+        int ini=0;
+        t = ByteBuffer.wrap(buffer, ini, 4).getInt();
+        ini+=4;
+        nChildren = ByteBuffer.wrap(buffer, ini, 4).getInt();
+        ini+=4;
+        myRectangulo = new Rectangulo(buffer, ini);
+        ini+=32;
+        myFilePosition = ByteBuffer.wrap(buffer, ini, 8).getLong();
+        ini+=8;
+
+        hijos = new ArrayList<Rectangulo>();
+        for (int i=0; i < nChildren; i++){
+            hijos.add(i, new Rectangulo(buffer, ini));
+            ini+=32;
+        }
+        ini = ini + ((2*t)+1-nChildren)*32;
+
+        childrenFilePosition = new long[(2*t)+1];
+        for (int i=0; i < nChildren; i++){
+            childrenFilePosition[i] = ByteBuffer.wrap(buffer, ini, 8).getLong();
+            ini+=8;
+        }
+        ini = ini + ((2*t)+1-nChildren)*8;
     }
 }
