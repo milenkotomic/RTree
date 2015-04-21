@@ -42,11 +42,47 @@ public class RTree {
         return false;
     }
 
-    public void insertar(Rectangulo c){
+    public void insertar(Rectangulo c, int level, int m){
+        Nodo nodo=ChooseSubTree(level);
+        if(!nodo.isFull()){
+            nodo.getKeys().add(c);
+        }else{
+            split(nodo, m);
+        }
 
     }
-    public void split(){
 
+    private Nodo ChooseSubTree(int level) {
+        return null;
+    }
+
+    public void split(Nodo nodo, int m){
+        int dimension=ChooseSplitAxis(nodo,m);
+        int index=ChooseSplitIndex(dimension,nodo);
+    }
+
+    private int ChooseSplitIndex(int dimension, Nodo nodo) {
+
+    }
+
+    private ArrayList<Rectangulo> sortByAncho(ArrayList<Rectangulo> keys) {
+        return null;
+    }
+
+    private ArrayList<Rectangulo> sortByAlto(ArrayList<Rectangulo> keys) {
+        return keys;
+    }
+
+    private int ChooseSplitAxis(Nodo nodo, int m) {
+        /*
+        Se ordena por alto y ancho, luego x cadaarreglo, tomamos todas las permutaciones y calculamos su MBR, despues calculamos el permietro de cada uno
+        calculo la suma y me quedo con la menor, repito el proceso para la otra dimension. finalmente me quedo con la menor
+         */
+        ArrayList<Rectangulo> keys = nodo.getKeys();
+        ArrayList<Rectangulo> anchos=sortByAncho(keys);
+        ArrayList<Rectangulo> altos= sortByAlto(keys);
+
+        return 0;
     }
 
     /**
