@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
@@ -94,9 +95,6 @@ public class Nodo {
         this.hijos = hijos;
     }
 
-    public void writeToBuffer(byte[] buffer) {
-    }
-
     public Nodo(int t, long filePos){
         setT(t);
         setnChildren(0);
@@ -131,4 +129,85 @@ public class Nodo {
         }
         ini = ini + ((2*t)+1-nChildren)*8;
     }
+
+    public Rectangulo getChild(int i){
+        return hijos.get(i);
+    }
+
+    public long getChildFilePosition(int i){
+        return childrenFilePosition[i];
+    }
+
+    public void addRectangulo(Rectangulo r, long newFilePosition){
+        childrenFilePosition[nChildren] = newFilePosition;
+        expandRectangulo(r);
+    }
+
+    public void expandRectangulo(Rectangulo r){
+        if (this.isEmpty()){
+            myRectangulo = r;
+        }
+        else{
+            myRectangulo = new Rectangulo(myRectangulo, r);
+        }
+        hijos.add(nChildren++, r);
+    }
+
+    public void writeToBuffer(byte [] buffer) throws IOException {
+        int ini= 0;
+        ByteBuffer.wrap(buffer, ini, 4).putInt(t);
+        ini= ini+4;
+        ByteBuffer.wrap(buffer, ini, 4).putInt(nChildren);
+        ini= ini+4;
+        myRectangulo.writeToBuffer(buffer, ini);
+        ini += 32;
+        ByteBuffer.wrap(buffer, ini, 8).putLong(myFilePosition);
+        ini= ini + 8;
+        for (int i=0; i< nChildren; i++){
+            hijos.get(i).writeToBuffer(buffer, ini);
+            ini = ini + 32;
+        }
+        ini = ini + ((2*t)+1-nChildren)*32;
+        for (int i=0; i<nChildren; i++){
+            ByteBuffer.wrap(buffer, ini, 8).putLong(childrenFilePosition[i]);
+            ini= ini+8;
+        }        ini = ini + ((2*t)+1-nChildren)*8;
+
+    }
+
+    public boolean contains(Rectangulo r){
+        for (Rectangulo hijo : hijos){
+            if (hijo.contains(r))
+                return true;
+        }
+        return false;
+    }
+
+    public void clear() throws Exception{
+        childrenFilePosition = new long[(2*t)+1];
+        hijos = new ArrayList<Rectangulo>();
+        myRectangulo = null;
+        nChildren = 0;
+    }
+
+    public boolean equals(Object o){
+        if(!(o instanceof Nodo)){
+            return false;
+        }
+        Nodo n = (Nodo) o;
+        boolean isEqual =
+                this.t == n.t &&
+                        this.nChildren == n.nChildren &&
+                        this.myRectangulo.equals(n.myRectangulo) &&
+                        this.myFilePosition == n.myFilePosition;
+        for (int i = 0; isEqual && i < nChildren; i++) {
+            isEqual = isEqual && this.hijos.get(i).equals(n.hijos.get(i));
+        }
+        for (int i = 0; isEqual && i < nChildren; i++) {
+            isEqual = isEqual && this.childrenFilePosition[i] == n.childrenFilePosition[i];
+        }
+        return isEqual;
+    }
+
+
 }
