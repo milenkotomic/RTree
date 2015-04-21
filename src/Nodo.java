@@ -198,6 +198,4 @@ public class Nodo {
         }
         return isEqual;
     }
-
-
 }

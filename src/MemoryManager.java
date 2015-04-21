@@ -73,21 +73,21 @@ public class MemoryManager {
      * Recibe un Node y lo escribe en el buffer, si no tengo espacio libre
      * escribo uno de los buffers a disco (el de peor prioridad) y
      * sobreescribo el buffer con mi Node
-     * @param node Nodon que quiero guardar
+     * @param nodo Nodo que quiero guardar
      * @throws IOException
      * */
-    public void saveNode(Nodo node) throws IOException{
+    public void saveNode(Nodo nodo) throws IOException{
         if(numOfElements < numOfBuffers){
-            elements.put(node.getMyFilePosition(), node);
-            bufWasModified.put(node.getMyFilePosition(), true);
+            elements.put(nodo.getMyFilePosition(), nodo);
+            bufWasModified.put(nodo.getMyFilePosition(), true);
             numOfElements++;
-            improvePriority(node.getMyFilePosition());
+            improvePriority(nodo.getMyFilePosition());
             return;
         }
-        if(elements.containsKey(node.getMyFilePosition())){
-            elements.put(node.getMyFilePosition(), node);
-            bufWasModified.put(node.getMyFilePosition(), true);
-            improvePriority(node.getMyFilePosition());
+        if(elements.containsKey(nodo.getMyFilePosition())){
+            elements.put(nodo.getMyFilePosition(), nodo);
+            bufWasModified.put(nodo.getMyFilePosition(), true);
+            improvePriority(nodo.getMyFilePosition());
         }
         else{
             long exit = priority.pollLast();
@@ -96,9 +96,9 @@ public class MemoryManager {
             writeBlockToFile(buffer, temp.getMyFilePosition());
             bufWasModified.remove(exit);
             elements.remove(exit);
-            elements.put(node.getMyFilePosition(), node);
-            priority.addFirst(node.getMyFilePosition());
-            bufWasModified.put(node.getMyFilePosition(), true);
+            elements.put(nodo.getMyFilePosition(), nodo);
+            priority.addFirst(nodo.getMyFilePosition());
+            bufWasModified.put(nodo.getMyFilePosition(), true);
         }
 
     }
@@ -129,6 +129,4 @@ public class MemoryManager {
         position += buffer.length;
         return temp;
     }
-
-
 }
