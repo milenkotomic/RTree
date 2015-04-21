@@ -22,7 +22,6 @@ public class Nodo {
     private int nChildren;
     private ArrayList<Rectangulo> keys;
     private Rectangulo myRectangulo;
-    private ArrayList<Rectangulo> hijos;
     private long myFilePosition;
     private long[] childrenFilePosition;
 
@@ -84,22 +83,13 @@ public class Nodo {
 
     public boolean isLeaf(){
 
-        return getHijos().isEmpty();
-    }
-
-    public ArrayList<Rectangulo> getHijos() {
-        return hijos;
-    }
-
-    public void setHijos(ArrayList<Rectangulo> hijos) {
-        this.hijos = hijos;
+        return childrenFilePosition.length == 0;
     }
 
     public Nodo(int t, long filePos){
         setT(t);
         setnChildren(0);
         setKeys(new ArrayList<Rectangulo>());
-        setHijos(new ArrayList<Rectangulo>());
         setMyFilePosition(filePos);
         setChildrenFilePosition(new long[(2*t)+1]);
     }
@@ -115,9 +105,9 @@ public class Nodo {
         myFilePosition = ByteBuffer.wrap(buffer, ini, 8).getLong();
         ini+=8;
 
-        hijos = new ArrayList<Rectangulo>();
+        keys = new ArrayList<Rectangulo>();
         for (int i=0; i < nChildren; i++){
-            hijos.add(i, new Rectangulo(buffer, ini));
+            keys.add(i, new Rectangulo(buffer, ini));
             ini+=32;
         }
         ini = ini + ((2*t)+1-nChildren)*32;
@@ -130,8 +120,8 @@ public class Nodo {
         ini = ini + ((2*t)+1-nChildren)*8;
     }
 
-    public Rectangulo getChild(int i){
-        return hijos.get(i);
+    public Rectangulo getKeys(int i){
+        return keys.get(i);
     }
 
     public long getChildFilePosition(int i){
@@ -150,7 +140,7 @@ public class Nodo {
         else{
             myRectangulo = new Rectangulo(myRectangulo, r);
         }
-        hijos.add(nChildren++, r);
+        keys.add(nChildren++, r);
     }
 
     public void writeToBuffer(byte [] buffer) throws IOException {
@@ -164,7 +154,7 @@ public class Nodo {
         ByteBuffer.wrap(buffer, ini, 8).putLong(myFilePosition);
         ini= ini + 8;
         for (int i=0; i< nChildren; i++){
-            hijos.get(i).writeToBuffer(buffer, ini);
+            keys.get(i).writeToBuffer(buffer, ini);
             ini = ini + 32;
         }
         ini = ini + ((2*t)+1-nChildren)*32;
@@ -176,7 +166,7 @@ public class Nodo {
     }
 
     public boolean contains(Rectangulo r){
-        for (Rectangulo hijo : hijos){
+        for (Rectangulo hijo : keys){
             if (hijo.contains(r))
                 return true;
         }
@@ -185,7 +175,7 @@ public class Nodo {
 
     public void clear() throws Exception{
         childrenFilePosition = new long[(2*t)+1];
-        hijos = new ArrayList<Rectangulo>();
+        keys = new ArrayList<Rectangulo>();
         myRectangulo = null;
         nChildren = 0;
     }
@@ -201,7 +191,7 @@ public class Nodo {
                         this.myRectangulo.equals(n.myRectangulo) &&
                         this.myFilePosition == n.myFilePosition;
         for (int i = 0; isEqual && i < nChildren; i++) {
-            isEqual = isEqual && this.hijos.get(i).equals(n.hijos.get(i));
+            isEqual = isEqual && this.keys.get(i).equals(n.keys.get(i));
         }
         for (int i = 0; isEqual && i < nChildren; i++) {
             isEqual = isEqual && this.childrenFilePosition[i] == n.childrenFilePosition[i];
