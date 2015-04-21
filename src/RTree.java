@@ -1,3 +1,8 @@
+import org.w3c.dom.css.Rect;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -8,38 +13,48 @@ public class RTree {
     Esta es la clase RTree que no usa reinsert, al momento de insertar un valor
      */
     private Nodo raiz;
-    public RTree(Nodo raiz){
+    protected int t;
+    protected MemoryManager mem;
+    protected int splitCounter;
+    protected int visitCount;
+    public RTree(int t) throws FileNotFoundException {
+        this.raiz=new Nodo(t, mem.getNewPosition());
+        this.t = t;
+        mem = new MemoryManager(10, 4096);
+        splitCounter = 0;
+        visitCount = 0;
 
-        this.raiz=raiz;
     }
-    public boolean buscar(Rectangulo c){
+    public ArrayList<Rectangulo> buscar(Rectangulo c) throws IOException {
+        return buscar_aux(raiz, c);
 
-        return buscar_aux(this.getRaiz(),c);
     }
 
-    private boolean buscar_aux(Nodo nodo, Rectangulo c) {
+    private ArrayList<Rectangulo> buscar_aux(Nodo nodo, Rectangulo c) throws IOException {
+        ArrayList <Rectangulo> result = new ArrayList<Rectangulo>();
         if (nodo.isLeaf()){
             ArrayList<Rectangulo> keys=nodo.getKeys();
             for (Rectangulo key : keys){
-                if(key.equals(c)){
-                    return true;
+                if(key.intersect(c)){
+                    result.add(key);
                 }
             }
-            return false;
-        }else{
+            return result;
+        }
+        else{
             ArrayList<Rectangulo> keys=nodo.getKeys();
             int i;
             for (i=0; i<keys.size(); i++){
-                if(keys.get(i).equals(c)){
-                    return true;
-                }
-                if(keys.get(i).contains(c)){
-                    break;
+                if(keys.get(i).intersect(c)){
+                    Nodo child = mem.loadNode(nodo.getChildFilePosition(i));
+                    long filePosNodo = nodo.getMyFilePosition();
+                    mem.saveNode(nodo);
+                    result.addAll(buscar_aux(child, c));
+                    mem.loadNode(filePosNodo);
                 }
             }
-            buscar_aux(nodo.getHijos().get(i),c);
         }
-        return false;
+        return result;
     }
 
     public void insertar(Rectangulo c, int level, int m){

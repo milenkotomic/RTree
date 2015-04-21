@@ -130,5 +130,7 @@ public class Rectangulo {
         return (new Rectangulo(this, r)).area() - this.area();
     }
 
-
+    public boolean intersect (Rectangulo r){
+        return this.areaInterseccion(r) > 0;
+    }
 }
