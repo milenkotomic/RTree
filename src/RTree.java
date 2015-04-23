@@ -1,9 +1,10 @@
-import org.w3c.dom.css.Rect;
+
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by luism on 17-04-15.
@@ -57,7 +58,7 @@ public class RTree {
         return result;
     }
 
-    public void insertar(Rectangulo c, int level, int m){
+    public void insertar_aux(Rectangulo c, int level, int m){
         Nodo nodo=ChooseSubTree(level);
         if(!nodo.isFull()){
             nodo.getKeys().add(c);
@@ -72,32 +73,97 @@ public class RTree {
     }
 
     public void split(Nodo nodo, int m){
-        int dimension=ChooseSplitAxis(nodo,m);
-        int index=ChooseSplitIndex(dimension,nodo);
+        ArrayList<Rectangulo> keys_ancho = nodo.getKeys();
+        ArrayList<Rectangulo> keys_alto = nodo.getKeys();
+        Collections.sort(keys_ancho,Rectangulo.compareAlto());
+        Collections.sort(keys_alto,Rectangulo.compareAncho());
+        int dimension=ChooseSplitAxis(nodo, m, keys_ancho, keys_alto);
+        ArrayList<Rectangulo> keys;
+        if (dimension==0){
+            keys=keys_ancho;
+        }else {
+            keys=keys_alto;
+        }
+        int index=ChooseSplitIndex(nodo,m,keys);
+        
     }
 
-    private int ChooseSplitIndex(int dimension, Nodo nodo) {
-
+    /**
+     *
+     * @param nodo, el nodo sobre el cual se hace el split
+     * @param m, parametro para calcular las distribuciones
+     * @param keys, el conjunto de llaves del nodo, ordenadas x alguna dimension
+     * @return indice correspondiente a la division entre las 2 distribuciones
+     */
+    private int ChooseSplitIndex(Nodo nodo, int m, ArrayList<Rectangulo> keys) {
+        int splitDistribution=2*nodo.getT()-2*m+2;
+        ArrayList<Double> inter=new ArrayList<Double>();
+        ArrayList<Double> areas=new ArrayList<Double>();
+        for (int i = 0; i < splitDistribution; i++) {
+            List<Rectangulo> part1 = keys.subList(0, m + i);//m-1+i+1, sublist no considera el ultimo
+            List<Rectangulo> part2 = keys.subList(m + i, keys.size());
+            Rectangulo mbr1 = nodo.generarMbr(part1);
+            Rectangulo mbr2 = nodo.generarMbr(part2);
+            inter.add(mbr1.areaInterseccion(mbr2));
+            areas.add(mbr1.area()+mbr2.area());
+        }
+        double min=inter.get(0);
+        int indice=0;
+        for(double d : inter){
+            if (d<=min){
+                if (areas.get(areas.indexOf(d))<=areas.get(indice)) {
+                    min=d;
+                    indice=inter.indexOf(d);
+                }
+            }
+        }
+        return indice+m;
     }
 
-    private ArrayList<Rectangulo> sortByAncho(ArrayList<Rectangulo> keys) {
-        return null;
-    }
-
-    private ArrayList<Rectangulo> sortByAlto(ArrayList<Rectangulo> keys) {
-        return keys;
-    }
-
-    private int ChooseSplitAxis(Nodo nodo, int m) {
+    /**
+     * Escoge la dimension sobre la cual hacer el corte
+     * @param nodo, el nodo que se quiere dividir
+     * @param m, parametro para calcular la distribuciones.
+     * @param keys_ancho
+     * @param keys_alto
+     * @return 1 si la dimension es alto, 0 si es ancho
+     */
+    private int ChooseSplitAxis(Nodo nodo, int m, ArrayList<Rectangulo> keys_ancho, ArrayList<Rectangulo> keys_alto) {
         /*
         Se ordena por alto y ancho, luego x cadaarreglo, tomamos todas las permutaciones y calculamos su MBR, despues calculamos el permietro de cada uno
         calculo la suma y me quedo con la menor, repito el proceso para la otra dimension. finalmente me quedo con la menor
          */
-        ArrayList<Rectangulo> keys = nodo.getKeys();
-        ArrayList<Rectangulo> anchos=sortByAncho(keys);
-        ArrayList<Rectangulo> altos= sortByAlto(keys);
 
-        return 0;
+        double sum_ancho=calculateDistributions(nodo, m, keys_ancho);
+        double sum_alto=calculateDistributions(nodo,m,keys_alto);
+        if (sum_alto>sum_ancho){
+            return 1;
+        }else{
+            return 0;
+        }
+    }
+
+    private double calculateDistributions(Nodo nodo, int m,ArrayList<Rectangulo> keys) {
+        int splitDistribution=2*nodo.getT()-2*m+2;
+        ArrayList<Double> dist1=new ArrayList<Double>();
+        ArrayList<Double> dist2=new ArrayList<Double>();
+        for (int i = 0; i < splitDistribution; i++) {
+            List<Rectangulo> part1 = keys.subList(0, m + i);//m-1+i+1, sublist no considera el ultimo
+            List<Rectangulo> part2 = keys.subList(m + i, keys.size());
+            Rectangulo mbr1=nodo.generarMbr(part1);
+            Rectangulo mbr2=nodo.generarMbr(part2);
+            double margen1=mbr1.perimetro();
+            double margen2=mbr2.perimetro();
+            dist1.add(margen1);
+            dist2.add(margen2);
+        }
+        double sum1 = 0;
+        for(Double d : dist1)
+            sum1 += d;
+        double sum2 = 0;
+        for(Double d : dist2)
+            sum2 += d;
+        return  sum1+sum2;
     }
 
     /**
@@ -126,6 +192,11 @@ public class RTree {
             insertar(r);
         }
     }
+
+    public void insertar(Rectangulo r) {
+
+    }
+
     public Nodo getRaiz() {
 
         return raiz;
