@@ -2,9 +2,7 @@
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by luism on 17-04-15.
@@ -60,9 +58,8 @@ public class RTree {
 
     public void insertar_aux(Rectangulo c, int level, int m){
         Nodo nodo=ChooseSubTree(level);
-        if(!nodo.isFull()){
-            nodo.getKeys().add(c);
-        }else{
+        nodo.getKeys().add(c);
+        if(nodo.isFull()){
             split(nodo, m);
         }
 
@@ -73,20 +70,53 @@ public class RTree {
     }
 
     public void split(Nodo nodo, int m){
-        ArrayList<Rectangulo> keys_ancho = nodo.getKeys();
-        ArrayList<Rectangulo> keys_alto = nodo.getKeys();
-        Collections.sort(keys_ancho,Rectangulo.compareAlto());
-        Collections.sort(keys_alto,Rectangulo.compareAncho());
-        int dimension=ChooseSplitAxis(nodo, m, keys_ancho, keys_alto);
-        ArrayList<Rectangulo> keys;
-        if (dimension==0){
-            keys=keys_ancho;
-        }else {
-            keys=keys_alto;
+        ArrayList<Rectangulo> keys = nodo.getKeys();
+        long[] filePositions = nodo.getChildrenFilePosition();
+        ArrayList<Rectangulo> axis_keys;
+        HashMap<Rectangulo, Long> RF = new HashMap<Rectangulo, Long>();
+
+        for (int i = 0; i < keys.size(); i++){
+            RF.put(keys.get(i), filePositions[i]);
         }
-        int index=ChooseSplitIndex(nodo,m,keys);
-        
+
+        Collections.sort(keys, Rectangulo.compareX1());
+        double sX1 = calculateDistributions(nodo, m, keys);
+        double min = sX1;
+        axis_keys = keys;
+
+        Collections.sort(keys, Rectangulo.compareX2());
+        double sX2 = calculateDistributions(nodo, m ,keys);
+        if (sX2 < min) {
+            axis_keys = keys;
+            min = sX2;
+        }
+
+        Collections.sort(keys, Rectangulo.compareY1());
+        double sY1 = calculateDistributions(nodo, m ,keys);
+        if (sY1 < min){
+            axis_keys = keys;
+            min = sY1;
+        }
+
+        Collections.sort(keys, Rectangulo.compareY2());
+        double sY2 = calculateDistributions(nodo, m ,keys);
+        if (sY2 < min){
+            axis_keys = keys;
+            min = sY2;
+        }
+
+        long[] newFilePos = new long[0];
+        for (Rectangulo key: keys){
+            long filepos = RF.get(key);
+            newFilePos[newFilePos.length] = filepos;
+        }
+        nodo.setChildrenFilePosition(newFilePos);
+
+        int index=ChooseSplitIndex(nodo, m, axis_keys);
+
     }
+
+
 
     /**
      *
@@ -143,7 +173,7 @@ public class RTree {
         }
     }
 
-    private double calculateDistributions(Nodo nodo, int m,ArrayList<Rectangulo> keys) {
+    private double calculateDistributions(Nodo nodo, int m, ArrayList<Rectangulo> keys) {
         int splitDistribution=2*nodo.getT()-2*m+2;
         ArrayList<Double> dist1=new ArrayList<Double>();
         ArrayList<Double> dist2=new ArrayList<Double>();

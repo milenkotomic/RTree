@@ -198,4 +198,8 @@ public class Nodo {
         }
         return isEqual;
     }
+
+    public static void compareX1() {
+
+    }
 }

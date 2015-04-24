@@ -1,4 +1,5 @@
 import java.nio.ByteBuffer;
+import java.util.Comparator;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
@@ -133,4 +134,5 @@ public class Rectangulo {
     public boolean intersect (Rectangulo r){
         return this.areaInterseccion(r) > 0;
     }
+
 }
