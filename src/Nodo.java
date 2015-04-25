@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by luism on 17-04-15.
@@ -32,7 +33,9 @@ public class Nodo {
     public void setT(int t) {
         this.t = t;
     }
-
+    public int getnKeys(){
+        return keys.size();
+    }
     public int getnChildren() {
         return nChildren;
     }
@@ -75,6 +78,9 @@ public class Nodo {
 
     public boolean isFull(){
         return (keys.size()>2*getT());
+    }
+    public long getChildFilePos(int i){
+        return childrenFilePosition[i];
     }
 
     public boolean isEmpty(){
@@ -120,7 +126,9 @@ public class Nodo {
         ini = ini + ((2*t)+1-nChildren)*8;
     }
 
-    public Rectangulo getKeys(int i){
+
+    public Rectangulo getkey(int i){
+
         return keys.get(i);
     }
 
@@ -199,7 +207,35 @@ public class Nodo {
         return isEqual;
     }
 
-    public static void compareX1() {
+    public Rectangulo generarMbr(List<Rectangulo> part1) {
+        Rectangulo mbr=part1.get(0);
+        for(Rectangulo r : part1){
+            mbr=new Rectangulo(mbr,r);
+        }
+        return mbr;
+    }
 
+    /**
+     * Calcula la diferencia de overlap, al momento de hacer una insercion
+     * @param r, el MBR sobre el cual se esta calculando el overlap
+     * @param r2, el rectangulo que se inserta.
+     * @return la diferencia de overlap
+     */
+    public double calculateOverlap(Rectangulo r, Rectangulo r2){
+        double overlap_init=0;
+        double overlap_final=0;
+        for (Rectangulo rect : keys) {
+            if (r.equals(rect))
+                continue;
+            overlap_init=+r.areaInterseccion(rect);
+        }
+        ArrayList<Rectangulo> copy=keys;
+        copy.add(r2);
+        for(Rectangulo rect : copy){
+            if (r.equals(rect))
+                continue;
+            overlap_final=+r.areaInterseccion(rect);
+        }
+        return  overlap_final-overlap_init;
     }
 }
