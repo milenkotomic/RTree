@@ -1,4 +1,5 @@
 import java.nio.ByteBuffer;
+import java.util.Comparator;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
@@ -33,6 +34,11 @@ public class Rectangulo {
         p2 = new Punto(xP2, yP2);
     }
 
+    /**
+     * Genera un rectangulo que contiene a r1 y r2
+     * @param r1
+     * @param r2
+     */
     public Rectangulo(Rectangulo r1, Rectangulo r2) {
         double p1X = Math.min(r1.p1.getX(), r2.p1.getX());
         double p1Y = Math.min(r1.p1.getY(), r2.p1.getY());
@@ -132,5 +138,28 @@ public class Rectangulo {
 
     public boolean intersect (Rectangulo r){
         return this.areaInterseccion(r) > 0;
+    }
+
+    static Comparator<Rectangulo> compareAncho() {
+        return new Comparator<Rectangulo>() {
+            @Override
+            public int compare(Rectangulo rectangulo, Rectangulo rectangulo2) {
+                double ancho1=rectangulo.p1.getX()-rectangulo.p2.getX();
+                double ancho2=rectangulo2.p1.getX()-rectangulo2.p2.getX();
+                return Double.valueOf(ancho1).compareTo(Double.valueOf(ancho2));
+            }
+            // compare using attribute 1
+        };
+    }
+    static Comparator<Rectangulo> compareAlto() {
+        return new Comparator<Rectangulo>() {
+            @Override
+            public int compare(Rectangulo rectangulo, Rectangulo rectangulo2) {
+                double alto1=rectangulo.p1.getY()-rectangulo.p2.getY();
+                double alto2=rectangulo2.p1.getY()-rectangulo2.p2.getY();
+                return Double.valueOf(alto1).compareTo(Double.valueOf(alto2));
+            }
+            
+        };
     }
 }
