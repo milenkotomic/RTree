@@ -2,10 +2,7 @@
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by luism on 17-04-15.
@@ -203,7 +200,18 @@ public class RTree {
         nodo.setChildrenFilePosition(newFilePos);
         int index=ChooseSplitIndex(nodo, axis_keys);
         //falta generar el nuevo nodo y retornarlo
-        return nodo;
+        Nodo newnodo=new Nodo(t,mem.getNewPosition());
+        ArrayList<Rectangulo> copy_keys = nodo.getKeys();
+        long[] child_copy = nodo.getChildrenFilePosition();
+        ArrayList<Rectangulo> part1 = (ArrayList<Rectangulo>) copy_keys.subList(0, index + 1);
+        ArrayList<Rectangulo> part2 = (ArrayList<Rectangulo>) copy_keys.subList(index + 1, copy_keys.size());
+        long[] childPart1 = Arrays.copyOfRange(child_copy, 0, index);
+        long[] childPart2 = Arrays.copyOfRange(child_copy, index + 1, child_copy.length);
+        newnodo.setKeys(part2);
+        newnodo.setChildrenFilePosition(childPart2);
+        nodo.setKeys(part1);
+        nodo.setChildrenFilePosition(childPart1);
+        return newnodo;
     }
 
     /**
