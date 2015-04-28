@@ -170,23 +170,23 @@ public class RTree {
         for (int i = 0; i < keys.size(); i++){
             RF.put(keys.get(i), filePositions[i]);
         }
-        Collections.sort(keys, Rectangulo.compareX1());
+        Collections.sort(keys, new CompareX1());
         double sX1 = calculateDistributions(nodo, keys);
         double min = sX1;
         axis_keys = keys;
-        Collections.sort(keys, Rectangulo.compareX2());
+        Collections.sort(keys, new CompareX2());
         double sX2 = calculateDistributions(nodo,keys);
         if (sX2 < min) {
             axis_keys = keys;
             min = sX2;
         }
-        Collections.sort(keys, Rectangulo.compareY1());
+        Collections.sort(keys, new CompareY1());
         double sY1 = calculateDistributions(nodo,keys);
         if (sY1 < min){
             axis_keys = keys;
             min = sY1;
         }
-        Collections.sort(keys, Rectangulo.compareY2());
+        Collections.sort(keys, new CompareY2());
         double sY2 = calculateDistributions(nodo,keys);
         if (sY2 < min){
             axis_keys = keys;
@@ -334,5 +334,62 @@ public class RTree {
 
         this.raiz = raiz;
     }
+
+    private class CompareX1 implements Comparator {
+        @Override
+        public int compare(Object o1, Object o2) {
+            Rectangulo r1 = (Rectangulo) o1;
+            Rectangulo r2 = (Rectangulo) o2;
+            if (r1.p1.getX() > r2.p1.getX())
+                return 1;
+            else if (r1.p1.getX() == r2.p1.getX())
+                return 0;
+            else
+                return -1;
+        }
+    }
+
+    private class CompareX2 implements Comparator {
+        @Override
+        public int compare(Object o1, Object o2) {
+            Rectangulo r1 = (Rectangulo) o1;
+            Rectangulo r2 = (Rectangulo) o2;
+            if (r1.p2.getX() > r2.p2.getX())
+                return 1;
+            else if (r1.p2.getX() == r2.p2.getX())
+                return 0;
+            else
+                return -1;
+        }
+    }
+
+    private class CompareY1 implements Comparator {
+        @Override
+        public int compare(Object o1, Object o2) {
+            Rectangulo r1 = (Rectangulo) o1;
+            Rectangulo r2 = (Rectangulo) o2;
+            if (r1.p1.getY() > r2.p1.getY())
+                return 1;
+            else if (r1.p1.getY() == r2.p1.getY())
+                return 0;
+            else
+                return -1;
+        }
+    }
+
+    private class CompareY2 implements Comparator {
+        @Override
+        public int compare(Object o1, Object o2) {
+            Rectangulo r1 = (Rectangulo) o1;
+            Rectangulo r2 = (Rectangulo) o2;
+            if (r1.p2.getY() > r2.p2.getY())
+                return 1;
+            else if (r1.p2.getY() == r2.p2.getY())
+                return 0;
+            else
+                return -1;
+        }
+    }
+
 
 }

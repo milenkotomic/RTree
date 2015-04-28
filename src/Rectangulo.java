@@ -163,10 +163,10 @@ public class Rectangulo {
         };
     }
 
-    public static Comparator<? super Rectangulo> compareX1() {
-    }
 
-    public static Comparator<? super Rectangulo> compareX2() {
+
+
+   /* public static Comparator<? super Rectangulo> compareX2() {
     }
 
     public static Comparator<? super Rectangulo> compareY1() {
@@ -174,4 +174,8 @@ public class Rectangulo {
 
     public static Comparator<? super Rectangulo> compareY2() {
     }
+
+    public static Comparator<? super Rectangulo> compareX1() {
+        return null;
+    }*/
 }
