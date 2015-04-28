@@ -156,10 +156,25 @@ public class RTree {
 
 
     private void splitRoot() {
-
+        Nodo newNode = split(getRaiz());
+        Nodo newRoot = new Nodo(t,mem.getNewPosition());
+        newRoot.addRectangulo(getRaiz().getMyRectangulo(), getRaiz().getMyFilePosition());
+        newRoot.addRectangulo(newNode.getMyRectangulo(), newNode.getMyFilePosition());
+        try {
+            mem.saveNode(newNode);
+            mem.saveNode(getRaiz());
+            mem.saveNode(newRoot);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        setRaiz(newRoot);
     }
     private void updateRoot(){
-
+        try {
+            setRaiz(mem.loadNode(getRaiz().getMyFilePosition()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public Nodo split(Nodo nodo){
