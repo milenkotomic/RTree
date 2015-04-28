@@ -88,8 +88,8 @@ public class Nodo {
     }
 
     public boolean isLeaf(){
-
-        return childrenFilePosition.length == 0;
+        return getnChildren()==0;
+        //return childrenFilePosition.length == 0;
     }
 
     public Nodo(int t, long filePos){

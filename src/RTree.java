@@ -18,10 +18,10 @@ public class RTree {
     protected int splitCounter;
     protected int visitCount;
     public RTree(int t) throws FileNotFoundException {
+        mem = new MemoryManager(10, 4096);
         this.raiz=new Nodo(t, mem.getNewPosition());
         this.t = t;
         this.m=(int)(t*0.4);
-        mem = new MemoryManager(10, 4096);
         splitCounter = 0;
         visitCount = 0;
 
@@ -61,8 +61,9 @@ public class RTree {
     public void insertar_aux(Rectangulo c,long ref,Nodo nodo) throws IOException {
         Nodo parent;
         if (!nodo.isLeaf()){//no es hoja
+            //System.out.println("No es Hoja");
             Rectangulo minMBR=null;
-            Nodo hijo=mem.loadNode(0);
+            Nodo hijo=mem.loadNode(nodo.getChildFilePos(0));
             if (!hijo.isLeaf()) {//si su hijo no es hoja se debe usar el incremento de area como criterio
                 double minArea = 0;
                 int index = 0;
@@ -134,6 +135,7 @@ public class RTree {
                 }
             }
         }else{
+            System.out.print("Es Hoja");
             //Estoy en una hoja, inserto y acomodo, luego reviso si hay overflow
             nodo.addRectangulo(c, -1);
             mem.saveNode(nodo);
