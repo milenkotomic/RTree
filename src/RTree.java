@@ -17,9 +17,10 @@ public class RTree {
     protected int m;
     protected int splitCounter;
     protected int visitCount;
+
     public RTree(int t) throws FileNotFoundException {
         mem = new MemoryManager(10, 4096);
-        this.raiz=new Nodo(t, mem.getNewPosition());
+        this.raiz = new Nodo(t, mem.getNewPosition());
         this.t = t;
         this.m=(int)(t*0.4);
         splitCounter = 0;
@@ -58,9 +59,10 @@ public class RTree {
         return result;
     }
 
-    public void insertar_aux(Rectangulo c,long ref,Nodo nodo) throws IOException {
+    public void insertar_aux(Rectangulo c, long ref, Nodo nodo) throws IOException {
         Nodo parent;
-        if (!nodo.isLeaf()){//no es hoja
+        if (!nodo.isLeaf() && !nodo.equals(getRaiz())){//no es hoja
+            System.out.println("NO SOY HOJA NI RAIZ");
             //System.out.println("No es Hoja");
             Rectangulo minMBR=new Rectangulo(new Punto(0,0),new Punto(0,0));
             Nodo hijo=mem.loadNode(nodo.getChildFilePos(0));
@@ -93,10 +95,11 @@ public class RTree {
                         mem.saveNode(nodo);
                         mem.saveNode(parent);
                     }
+                    parent.setnChildren(parent.getnChildren() + 1);
 
                 }
             }else {//Si los hijos son hojas, se debe utilizar el incremento de Overlap como criterio.
-                double minOverlap = 0;
+                double minOverlap = Double.MAX_VALUE;
                 int index = 0;
                 double incrementoArea=0;
                 for (int i = 0; i <nodo.getnKeys() ; i++) {
@@ -132,17 +135,21 @@ public class RTree {
                         mem.saveNode(nodo);
                         mem.saveNode(parent);
                     }
+                    parent.setnChildren(parent.getnChildren() + 1);
 
                 }
             }
         }else{
             //Estoy en una hoja, inserto y acomodo, luego reviso si hay overflow
-            nodo.addRectangulo(c,mem.getNewPosition());
+            nodo.addRectangulo(c, mem.getNewPosition());
             mem.saveNode(nodo);
+            System.out.println("SOY HOJA " + c);
             if(nodo.isFull()){
+                System.out.println("Nodo lleno");
                 parent = mem.loadNode(ref);
                 if(nodo.equals(parent)){//soy la raiz, caso especial
                     splitRoot();
+                    getRaiz().setnChildren(getRaiz().getnChildren()+1);
                 }
                 else{
                     Nodo newNode = split(nodo);
@@ -151,7 +158,9 @@ public class RTree {
                     mem.saveNode(nodo);
                     mem.saveNode(parent);
                     updateRoot();
+                    parent.setnChildren(parent.getnChildren() + 1);
                 }
+
             }
         }
     }
@@ -159,9 +168,10 @@ public class RTree {
 
     private void splitRoot() {
         Nodo newNode = split(getRaiz());
-        Nodo newRoot = new Nodo(t,mem.getNewPosition());
+        Nodo newRoot = new Nodo(t, mem.getNewPosition());
         newRoot.addRectangulo(getRaiz().getMyRectangulo(), getRaiz().getMyFilePosition());
         newRoot.addRectangulo(newNode.getMyRectangulo(), newNode.getMyFilePosition());
+
         try {
             mem.saveNode(newNode);
             mem.saveNode(getRaiz());
@@ -179,12 +189,12 @@ public class RTree {
         }
     }
 
-    public Nodo split(Nodo nodo){
+    public Nodo split(Nodo nodo) {
         ArrayList<Rectangulo> keys = nodo.getKeys();
         long[] filePositions = nodo.getChildrenFilePosition();
         ArrayList<Rectangulo> axis_keys;
         HashMap<Rectangulo, Long> RF = new HashMap<Rectangulo, Long>();
-        for (int i = 0; i < keys.size(); i++){
+        for (int i = 0; i < keys.size(); i++) {
             RF.put(keys.get(i), filePositions[i]);
         }
         Collections.sort(keys, new CompareX1());
@@ -192,42 +202,53 @@ public class RTree {
         double min = sX1;
         axis_keys = keys;
         Collections.sort(keys, new CompareX2());
-        double sX2 = calculateDistributions(nodo,keys);
+        double sX2 = calculateDistributions(nodo, keys);
         if (sX2 < min) {
             axis_keys = keys;
             min = sX2;
         }
         Collections.sort(keys, new CompareY1());
-        double sY1 = calculateDistributions(nodo,keys);
-        if (sY1 < min){
+        double sY1 = calculateDistributions(nodo, keys);
+        if (sY1 < min) {
             axis_keys = keys;
             min = sY1;
         }
         Collections.sort(keys, new CompareY2());
-        double sY2 = calculateDistributions(nodo,keys);
-        if (sY2 < min){
+        double sY2 = calculateDistributions(nodo, keys);
+        if (sY2 < min) {
             axis_keys = keys;
             min = sY2;
         }
-        long[] newFilePos = new long[0];
-        for (Rectangulo key: keys){
+        long[] newFilePos = new long[RF.size()];
+        for (int i = 0; i < RF.size(); i++) {
+            Rectangulo key = keys.get(i);
             long filepos = RF.get(key);
-            newFilePos[newFilePos.length] = filepos;
+            newFilePos[i] = filepos;
         }
         nodo.setChildrenFilePosition(newFilePos);
-        int index=ChooseSplitIndex(nodo, axis_keys);
+        int index = ChooseSplitIndex(nodo, axis_keys);
         //falta generar el nuevo nodo y retornarlo
-        Nodo newnodo=new Nodo(t,mem.getNewPosition());
+        Nodo newnodo = new Nodo(t, mem.getNewPosition());
         ArrayList<Rectangulo> copy_keys = nodo.getKeys();
         long[] child_copy = nodo.getChildrenFilePosition();
-        ArrayList<Rectangulo> part1 = (ArrayList<Rectangulo>) copy_keys.subList(0, index + 1);
-        ArrayList<Rectangulo> part2 = (ArrayList<Rectangulo>) copy_keys.subList(index + 1, copy_keys.size());
-        long[] childPart1 = Arrays.copyOfRange(child_copy, 0, index);
+
+        ArrayList<Rectangulo> part1 = new ArrayList<Rectangulo>();
+        part1.addAll(copy_keys.subList(0, index + 1));
+
+
+        ArrayList<Rectangulo> part2 = new ArrayList<Rectangulo>();
+        part2.addAll(copy_keys.subList(index + 1, copy_keys.size()));
+
+        long[] childPart1 = Arrays.copyOfRange(child_copy, 0, index + 1);
         long[] childPart2 = Arrays.copyOfRange(child_copy, index + 1, child_copy.length);
-        newnodo.setKeys(part2);
-        newnodo.setChildrenFilePosition(childPart2);
+        for (int i = 0; i < part2.size(); i++) {
+            newnodo.addRectangulo(part2.get(i), childPart2[i]);
+        }
+        newnodo.setnChildren(childPart2.length);
+
         nodo.setKeys(part1);
         nodo.setChildrenFilePosition(childPart1);
+        nodo.setnChildren(childPart1.length);
         return newnodo;
     }
 
@@ -253,7 +274,7 @@ public class RTree {
         int indice = 0;
         for (double d : inter) {
             if (d <= min) {
-                if (areas.get(areas.indexOf(d)) <= areas.get(indice)) {
+                if (areas.get(inter.indexOf(d)) <= areas.get(indice)) {
                     min = d;
                     indice = inter.indexOf(d);
                 }
@@ -286,6 +307,8 @@ public class RTree {
 
     private double calculateDistributions(Nodo nodo,ArrayList<Rectangulo> keys) {
         int splitDistribution=2*nodo.getT()-2*m+2;
+        System.out.println("SPLIT DIST!! "+splitDistribution);
+        System.out.println("KEYS:SIZE "+keys.size());
         ArrayList<Double> dist1=new ArrayList<Double>();
         ArrayList<Double> dist2=new ArrayList<Double>();
         for (int i = 0; i < splitDistribution; i++) {
@@ -329,6 +352,8 @@ public class RTree {
      */
     public void insertaRectangulos(int nRectangles){
         for (int i=0;i<nRectangles;i++){
+            if (i%50000 == 0)
+                System.out.println("i="+i);
             Rectangulo r=generaRectangulo();
             insertar(r);
         }
@@ -336,7 +361,7 @@ public class RTree {
 
     public void insertar(Rectangulo r) {
         try {
-            insertar_aux(r,getRaiz().getMyFilePosition(),getRaiz());
+            insertar_aux(r, getRaiz().getMyFilePosition(), getRaiz());
         } catch (IOException e) {
             e.printStackTrace();
         }

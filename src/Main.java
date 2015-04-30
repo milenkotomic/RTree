@@ -5,7 +5,8 @@ import java.io.FileNotFoundException;
  */
 public class Main {
     static public void main (String[]args) throws FileNotFoundException {
-        RTree tree=new RTree(40);
-        tree.insertaRectangulos(25);
+        RTree tree=new RTree(20);
+        tree.insertaRectangulos(42);
+        System.out.println(tree.m);
     }
 }

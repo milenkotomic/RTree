@@ -45,7 +45,7 @@ public class Rectangulo {
         double p2X = Math.max(r1.p2.getX(), r2.p2.getX());
         double p2Y = Math.max(r1.p2.getY(), r2.p2.getY());
         p1 = new Punto(p1X, p1Y);
-        p1 = new Punto(p2X, p2Y);
+        p2 = new Punto(p2X, p2Y);
 
 
     }
@@ -91,7 +91,6 @@ public class Rectangulo {
     }
 
     public void writeToBuffer(byte[] buffer, int ini) {
-        ini = 0;
         ByteBuffer.wrap(buffer, ini, 8).putDouble(p1.getX());
         ini+=8;
         ByteBuffer.wrap(buffer, ini, 8).putDouble(p1.getY());
@@ -161,6 +160,10 @@ public class Rectangulo {
             }
             
         };
+    }
+
+    public boolean isAPoint() {
+        return p1.equals(p2);
     }
 
 
