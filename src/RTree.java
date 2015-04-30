@@ -61,7 +61,7 @@ public class RTree {
 
     public void insertar_aux(Rectangulo c, long ref, Nodo nodo) throws IOException {
         Nodo parent;
-        if (!nodo.isLeaf() && !nodo.equals(getRaiz())){//no es hoja
+        if (!nodo.isLeaf()){//no es hoja
             System.out.println("NO SOY HOJA NI RAIZ");
             //System.out.println("No es Hoja");
             Rectangulo minMBR=new Rectangulo(new Punto(0,0),new Punto(0,0));
@@ -244,11 +244,11 @@ public class RTree {
         for (int i = 0; i < part2.size(); i++) {
             newnodo.addRectangulo(part2.get(i), childPart2[i]);
         }
-        newnodo.setnChildren(childPart2.length);
+
 
         nodo.setKeys(part1);
         nodo.setChildrenFilePosition(childPart1);
-        nodo.setnChildren(childPart1.length);
+
         return newnodo;
     }
 

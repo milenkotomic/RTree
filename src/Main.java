@@ -1,12 +1,16 @@
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * Created by luism on 28-04-15.
  */
 public class Main {
-    static public void main (String[]args) throws FileNotFoundException {
-        RTree tree=new RTree(20);
-        tree.insertaRectangulos(42);
+    static public void main (String[]args) throws IOException {
+        RTree tree=new RTree(16);
+        tree.insertaRectangulos(8000);
+        //System.out.println(tree.m);
+        Nodo hijo1=tree.mem.loadNode(tree.getRaiz().getChildFilePosition(0));
+        Nodo hijo2=tree.mem.loadNode(tree.getRaiz().getChildFilePosition(1));
         System.out.println(tree.m);
     }
 }
