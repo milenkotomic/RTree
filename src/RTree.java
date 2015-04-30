@@ -62,7 +62,7 @@ public class RTree {
         Nodo parent;
         if (!nodo.isLeaf()){//no es hoja
             //System.out.println("No es Hoja");
-            Rectangulo minMBR=null;
+            Rectangulo minMBR=new Rectangulo(new Punto(0,0),new Punto(0,0));
             Nodo hijo=mem.loadNode(nodo.getChildFilePos(0));
             if (!hijo.isLeaf()) {//si su hijo no es hoja se debe usar el incremento de area como criterio
                 double minArea = 0;
@@ -101,6 +101,7 @@ public class RTree {
                 double incrementoArea=0;
                 for (int i = 0; i <nodo.getnKeys() ; i++) {
                     double overlap=nodo.calculateOverlap(c,nodo.getkey(i));
+                    System.out.println(c);
                     if(overlap < minOverlap){
                         minOverlap = overlap;
                         minMBR = nodo.getkey(i);
@@ -135,9 +136,8 @@ public class RTree {
                 }
             }
         }else{
-            System.out.print("Es Hoja");
             //Estoy en una hoja, inserto y acomodo, luego reviso si hay overflow
-            nodo.addRectangulo(c, -1);
+            nodo.addRectangulo(c,mem.getNewPosition());
             mem.saveNode(nodo);
             if(nodo.isFull()){
                 parent = mem.loadNode(ref);
