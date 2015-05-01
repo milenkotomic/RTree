@@ -22,6 +22,7 @@ public class RTree {
     public RTree(int t) throws FileNotFoundException {
         mem = new MemoryManager(10, 4096);
         this.raiz = new Nodo(t, mem.getNewPosition());
+        raiz.setIsLeaf(1);
         this.t = t;
         this.m=(int)(t*0.4);
         splitCounter = 0;
@@ -66,8 +67,6 @@ public class RTree {
     public void insertar_aux(Rectangulo c, long ref, Nodo nodo) throws IOException {
         Nodo parent;
         if (!nodo.isLeaf()){//no es hoja
-            //System.out.println("NO SOY HOJA NI RAIZ");
-            //System.out.println("No es Hoja");
             Rectangulo minMBR=new Rectangulo(new Punto(0,0),new Punto(0,0));
             Nodo hijo=mem.loadNode(nodo.getChildFilePos(0));
             accessDisk++;
@@ -198,6 +197,9 @@ public class RTree {
 
     private void splitRoot() {
         Nodo newNode = split(getRaiz());
+        if (getRaiz().isLeaf()){
+            newNode.setIsLeaf(1);
+        }
         Nodo newRoot = new Nodo(t, mem.getNewPosition());
         accessDisk++;
         newRoot.addRectangulo(getRaiz().getMyRectangulo(), getRaiz().getMyFilePosition());
@@ -280,7 +282,9 @@ public class RTree {
         for (int i = 0; i < part2.size(); i++) {
             newnodo.addRectangulo(part2.get(i), childPart2[i]);
         }
-
+        if (nodo.isLeaf()){
+            newnodo.setIsLeaf(1);
+        }
         try {
             nodo.clear();
         } catch (Exception e) {
@@ -289,8 +293,6 @@ public class RTree {
         for (int i=0; i < part1.size(); i++){
             nodo.addRectangulo(part1.get(i), childPart1[i]);
         }
-
-
         //nodo.setKeys(part1);
         //nodo.setChildrenFilePosition(childPart1);
         splitCounter++;

@@ -26,6 +26,14 @@ public class Nodo {
     private Rectangulo myRectangulo;
     private long myFilePosition;
     private long[] childrenFilePosition;
+    private int IsLeaf;
+    public int getIsLeaf() {
+        return IsLeaf;
+    }
+
+    public void setIsLeaf(int isLeaf) {
+        this.IsLeaf = isLeaf;
+    }
 
     public int getT() {
         return t;
@@ -96,7 +104,8 @@ public class Nodo {
     }
 
     public boolean isLeaf(){
-        return nChildren==0 || keys.get(0).isAPoint();
+        return this.IsLeaf==1;
+        //return nChildren==0 || keys.get(0).isAPoint();
         //return childrenFilePosition.length == 0;
     }
 
@@ -107,6 +116,7 @@ public class Nodo {
         setMyFilePosition(filePos);
         setChildrenFilePosition(new long[(2 * t) + 1]);
         nChildren = 0;
+        setIsLeaf(0);
     }
 
     public Nodo(byte[] buffer){
@@ -116,6 +126,8 @@ public class Nodo {
         nChildren = ByteBuffer.wrap(buffer, ini, 4).getInt();
         ini+=4;
         nKeys = ByteBuffer.wrap(buffer, ini, 4).getInt();
+        ini+=4;
+        IsLeaf =ByteBuffer.wrap(buffer, ini, 4).getInt();
         ini+=4;
         myRectangulo = new Rectangulo(buffer, ini);
         ini+=32;
@@ -171,6 +183,8 @@ public class Nodo {
         ByteBuffer.wrap(buffer, ini, 4).putInt(nChildren);
         ini= ini+4;
         ByteBuffer.wrap(buffer, ini, 4).putInt(nKeys);
+        ini= ini+4;
+        ByteBuffer.wrap(buffer, ini, 4).putInt(IsLeaf);
         ini= ini+4;
         myRectangulo.writeToBuffer(buffer, ini);
         ini += 32;
