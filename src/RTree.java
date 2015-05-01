@@ -135,6 +135,7 @@ public class RTree {
                     }
                 }
                 insertar_aux(c, nodo.getMyFilePosition(), mem.loadNode(nodo.getChildFilePos(index)));
+                nodo = mem.loadNode(nodo.getMyFilePosition());
                 accessDisk++;
                 parent = mem.loadNode(ref);
                 accessDisk++;
@@ -161,6 +162,7 @@ public class RTree {
             }
         }else{
             //Estoy en una hoja, inserto y acomodo, luego reviso si hay overflow
+            nodo.addRectangulo(c, -1);
             accessDisk++;
             mem.saveNode(nodo);
             accessDisk++;
@@ -177,6 +179,7 @@ public class RTree {
                 else{
                     Nodo newNode = split(nodo);
                     splitCounter++;
+                    //System.out.println("nChild "+newNode.getnChildren());
                     parent.addRectangulo(newNode.getMyRectangulo(), newNode.getMyFilePosition());
                     mem.saveNode(newNode);
                     accessDisk++;
@@ -278,7 +281,18 @@ public class RTree {
             newnodo.addRectangulo(part2.get(i), childPart2[i]);
         }
 
+        try {
+            nodo.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        for (int i=0; i < part1.size(); i++){
+            nodo.addRectangulo(part1.get(i), childPart1[i]);
+        }
 
+
+        //nodo.setKeys(part1);
+        //nodo.setChildrenFilePosition(childPart1);
         splitCounter++;
 
         return newnodo;
