@@ -17,6 +17,7 @@ public class RTree {
     protected int m;
     protected int splitCounter;
     protected int visitCount;
+    protected int accessDisk;
 
     public RTree(int t) throws FileNotFoundException {
         mem = new MemoryManager(10, 4096);
@@ -25,6 +26,7 @@ public class RTree {
         this.m=(int)(t*0.4);
         splitCounter = 0;
         visitCount = 0;
+        accessDisk =0;
 
     }
     public ArrayList<Rectangulo> buscar(Rectangulo c) throws IOException {
@@ -51,8 +53,10 @@ public class RTree {
                     Nodo child = mem.loadNode(nodo.getChildFilePosition(i));
                     long filePosNodo = nodo.getMyFilePosition();
                     mem.saveNode(nodo);
+                    accessDisk++;
                     result.addAll(buscar_aux(child, c));
                     mem.loadNode(filePosNodo);
+                    accessDisk++;
                 }
             }
         }
@@ -66,6 +70,7 @@ public class RTree {
             //System.out.println("No es Hoja");
             Rectangulo minMBR=new Rectangulo(new Punto(0,0),new Punto(0,0));
             Nodo hijo=mem.loadNode(nodo.getChildFilePos(0));
+            accessDisk++;
             if (!hijo.isLeaf()) {//si su hijo no es hoja se debe usar el incremento de area como criterio
                 double minArea = 0;
                 int index = 0;
@@ -82,18 +87,25 @@ public class RTree {
                     }
                 }
                 insertar_aux(c, nodo.getMyFilePosition(), mem.loadNode(nodo.getChildFilePos(index)));
+                accessDisk++;
                 parent = mem.loadNode(ref);
+                accessDisk++;
                 //revisar si hay overflow
                 if (nodo.isFull()){
                     if(nodo.equals(parent)){//si el nodo es la raiz
                         splitRoot();
+                        splitCounter++;
                     }
                     else{
                         Nodo newNode = split(nodo);
+                        splitCounter++;
                         parent.addRectangulo(newNode.getMyRectangulo(), newNode.getMyFilePosition());
                         mem.saveNode(newNode);
+                        accessDisk++;
                         mem.saveNode(nodo);
+                        accessDisk++;
                         mem.saveNode(parent);
+                        accessDisk++;
                     }
                     parent.setnChildren(parent.getnChildren() + 1);
 
@@ -122,18 +134,25 @@ public class RTree {
                     }
                 }
                 insertar_aux(c, nodo.getMyFilePosition(), mem.loadNode(nodo.getChildFilePos(index)));
+                accessDisk++;
                 parent = mem.loadNode(ref);
+                accessDisk++;
                 //revisar si hay overflow
                 if (nodo.isFull()){
                     if(nodo.equals(parent)){//si el nodo es la raiz
                         splitRoot();
+                        splitCounter++;
                     }
                     else{
                         Nodo newNode = split(nodo);
+                        splitCounter++;
                         parent.addRectangulo(newNode.getMyRectangulo(), newNode.getMyFilePosition());
                         mem.saveNode(newNode);
+                        accessDisk++;
                         mem.saveNode(nodo);
+                        accessDisk++;
                         mem.saveNode(parent);
+                        accessDisk++;
                     }
                     parent.setnChildren(parent.getnChildren() + 1);
 
@@ -142,21 +161,30 @@ public class RTree {
         }else{
             //Estoy en una hoja, inserto y acomodo, luego reviso si hay overflow
             nodo.addRectangulo(c, mem.getNewPosition());
+            accessDisk++;
             mem.saveNode(nodo);
+            accessDisk++;
             //System.out.println("SOY HOJA " + c);
             if(nodo.isFull()){
                 //System.out.println("Nodo lleno");
                 parent = mem.loadNode(ref);
+                accessDisk++;
                 if(nodo.equals(parent)){//soy la raiz, caso especial
                     splitRoot();
+                    splitCounter++;
                     getRaiz().setnChildren(2);
                 }
                 else{
                     Nodo newNode = split(nodo);
+                    splitCounter++;
+                    System.out.println("nChild "+newNode.getnChildren());
                     parent.addRectangulo(newNode.getMyRectangulo(), newNode.getMyFilePosition());
                     mem.saveNode(newNode);
+                    accessDisk++;
                     mem.saveNode(nodo);
+                    accessDisk++;
                     mem.saveNode(parent);
+                    accessDisk++;
                     updateRoot();
                     parent.setnChildren(parent.getnChildren() + 1);
                 }
@@ -169,13 +197,17 @@ public class RTree {
     private void splitRoot() {
         Nodo newNode = split(getRaiz());
         Nodo newRoot = new Nodo(t, mem.getNewPosition());
+        accessDisk++;
         newRoot.addRectangulo(getRaiz().getMyRectangulo(), getRaiz().getMyFilePosition());
         newRoot.addRectangulo(newNode.getMyRectangulo(), newNode.getMyFilePosition());
 
         try {
             mem.saveNode(newNode);
+            accessDisk++;
             mem.saveNode(getRaiz());
+            accessDisk++;
             mem.saveNode(newRoot);
+            accessDisk++;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -184,6 +216,7 @@ public class RTree {
     private void updateRoot(){
         try {
             setRaiz(mem.loadNode(getRaiz().getMyFilePosition()));
+            accessDisk++;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -229,6 +262,7 @@ public class RTree {
         int index = ChooseSplitIndex(nodo, axis_keys);
         //falta generar el nuevo nodo y retornarlo
         Nodo newnodo = new Nodo(t, mem.getNewPosition());
+        accessDisk++;
         ArrayList<Rectangulo> copy_keys = nodo.getKeys();
         long[] child_copy = nodo.getChildrenFilePosition();
 
@@ -377,6 +411,14 @@ public class RTree {
     public void setRaiz(Nodo raiz) {
 
         this.raiz = raiz;
+    }
+
+    public int getSplitCounter() {
+        return splitCounter;
+    }
+
+    public void setSplitCounter(int splitCounter) {
+        this.splitCounter = splitCounter;
     }
 
     private class CompareX1 implements Comparator {
