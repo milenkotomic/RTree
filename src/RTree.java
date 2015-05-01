@@ -62,7 +62,7 @@ public class RTree {
     public void insertar_aux(Rectangulo c, long ref, Nodo nodo) throws IOException {
         Nodo parent;
         if (!nodo.isLeaf()){//no es hoja
-            System.out.println("NO SOY HOJA NI RAIZ");
+            //System.out.println("NO SOY HOJA NI RAIZ");
             //System.out.println("No es Hoja");
             Rectangulo minMBR=new Rectangulo(new Punto(0,0),new Punto(0,0));
             Nodo hijo=mem.loadNode(nodo.getChildFilePos(0));
@@ -104,7 +104,7 @@ public class RTree {
                 double incrementoArea=0;
                 for (int i = 0; i <nodo.getnKeys() ; i++) {
                     double overlap=nodo.calculateOverlap(c,nodo.getkey(i));
-                    System.out.println(c);
+                    //System.out.println(c);
                     if(overlap < minOverlap){
                         minOverlap = overlap;
                         minMBR = nodo.getkey(i);
@@ -143,13 +143,13 @@ public class RTree {
             //Estoy en una hoja, inserto y acomodo, luego reviso si hay overflow
             nodo.addRectangulo(c, mem.getNewPosition());
             mem.saveNode(nodo);
-            System.out.println("SOY HOJA " + c);
+            //System.out.println("SOY HOJA " + c);
             if(nodo.isFull()){
-                System.out.println("Nodo lleno");
+                //System.out.println("Nodo lleno");
                 parent = mem.loadNode(ref);
                 if(nodo.equals(parent)){//soy la raiz, caso especial
                     splitRoot();
-                    getRaiz().setnChildren(getRaiz().getnChildren()+1);
+                    getRaiz().setnChildren(2);
                 }
                 else{
                     Nodo newNode = split(nodo);
@@ -248,6 +248,7 @@ public class RTree {
 
         nodo.setKeys(part1);
         nodo.setChildrenFilePosition(childPart1);
+        splitCounter++;
 
         return newnodo;
     }
@@ -307,8 +308,8 @@ public class RTree {
 
     private double calculateDistributions(Nodo nodo,ArrayList<Rectangulo> keys) {
         int splitDistribution=2*nodo.getT()-2*m+2;
-        System.out.println("SPLIT DIST!! "+splitDistribution);
-        System.out.println("KEYS:SIZE "+keys.size());
+        //System.out.println("SPLIT DIST!! "+splitDistribution);
+        //System.out.println("KEYS:SIZE "+keys.size());
         ArrayList<Double> dist1=new ArrayList<Double>();
         ArrayList<Double> dist2=new ArrayList<Double>();
         for (int i = 0; i < splitDistribution; i++) {
@@ -352,10 +353,11 @@ public class RTree {
      */
     public void insertaRectangulos(int nRectangles){
         for (int i=0;i<nRectangles;i++){
-            if (i%50000 == 0)
+            if (i%10000 == 0)
                 System.out.println("i="+i);
             Rectangulo r=generaRectangulo();
             insertar(r);
+
         }
     }
 
