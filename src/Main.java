@@ -6,7 +6,7 @@ import java.io.IOException;
  */
 public class Main {
     static public void main (String[]args) throws IOException {
-        RTree tree=new RTree(50);
+        RTree tree=new RTree(3);
         tree.insertaRectangulos(800000);
         //System.out.println(tree.m);
         Nodo hijo1=tree.mem.loadNode(tree.getRaiz().getChildFilePosition(0));

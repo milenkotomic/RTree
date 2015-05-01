@@ -40,6 +40,7 @@ public class Rectangulo {
      * @param r2
      */
     public Rectangulo(Rectangulo r1, Rectangulo r2) {
+
         double p1X = Math.min(r1.p1.getX(), r2.p1.getX());
         double p1Y = Math.min(r1.p1.getY(), r2.p1.getY());
         double p2X = Math.max(r1.p2.getX(), r2.p2.getX());
@@ -59,17 +60,23 @@ public class Rectangulo {
     }
 
     public double areaInterseccion(Rectangulo r){
-        double maxAncho = min(this.p2.getX(), r.p2.getX());
-        double minAncho = max(this.p1.getX(), r.p1.getX());
-        double ancho = maxAncho - minAncho;
+        try{
+            double maxAncho = min(this.p2.getX(), r.p2.getX());
+            double minAncho = max(this.p1.getX(), r.p1.getX());
+            double ancho = maxAncho - minAncho;
 
-        double maxAlto = min(this.p2.getY(), r.p2.getY());
-        double minAlto = max(this.p1.getY(), r.p1.getY());
-        double alto = maxAlto - minAlto;
+            double maxAlto = min(this.p2.getY(), r.p2.getY());
+            double minAlto = max(this.p1.getY(), r.p1.getY());
+            double alto = maxAlto - minAlto;
 
-        if (ancho > 0 && alto > 0)
-            return ancho * alto;
-        return 0;
+            if (ancho > 0 && alto > 0)
+                return ancho * alto;
+            return 0;
+        }
+        catch (Exception e){
+            System.out.println("wsadd");
+            return 0;
+        }
     }
     public boolean contains(Rectangulo r){
         /*
