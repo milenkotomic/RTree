@@ -121,7 +121,7 @@ public class Nodo {
     }
 
     public Nodo(byte[] buffer){
-        int ini=4;
+        int ini=0;
         t = ByteBuffer.wrap(buffer, ini, 4).getInt();
         ini+=4;
         nChildren = ByteBuffer.wrap(buffer, ini, 4).getInt();
@@ -177,8 +177,8 @@ public class Nodo {
 
     public void writeToBuffer(byte [] buffer) throws IOException {
         int ini= 0;
-        ByteBuffer.wrap(buffer, ini, 4).putInt(0);
-        ini+=4;
+        /*ByteBuffer.wrap(buffer, ini, 4).putInt(0);
+        ini+=4;*/
         ByteBuffer.wrap(buffer, ini, 4).putInt(t);
         ini= ini+4;
         ByteBuffer.wrap(buffer, ini, 4).putInt(nChildren);
@@ -198,7 +198,9 @@ public class Nodo {
         }
         ini = ini + ((2*t)+1- nKeys)*32;
         for (int i=0; i< nKeys; i++){
+
             ByteBuffer.wrap(buffer, ini, 8).putLong(childrenFilePosition[i]);
+
             ini= ini+8;
         }
         ini = ini + ((2*t)+1- nKeys)*8;

@@ -7,9 +7,9 @@ import java.util.ArrayList;
  */
 public class Main {
     static public void main (String[]args) throws IOException {
-        RTree tree=new RTree(10);
+        RTree tree=new RTree(50);
         long t1 = System.currentTimeMillis();
-        tree.insertaRectangulos(100000);
+        tree.insertaRectangulos(51200);
         long t2 = System.currentTimeMillis();
         long t = (t2 - t1)/1000;
         System.out.println("Tiempo: " + t);
