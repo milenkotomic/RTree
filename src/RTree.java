@@ -405,8 +405,8 @@ public class RTree {
      */
     public void insertaRectangulos(int nRectangles){
         for (int i=0;i<nRectangles;i++){
-            /*if (i%10000 == 0)
-                System.out.println("i="+i);*/
+            if (i%10000 == 0)
+                System.err.println("i="+i);
             Rectangulo r=generaRectangulo();
             insertar(r);
 
