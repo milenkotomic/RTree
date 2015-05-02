@@ -52,6 +52,7 @@ public class RTree {
             for (i=0; i<keys.size(); i++){
                 if(keys.get(i).intersect(c)){
                     Nodo child = mem.loadNode(nodo.getChildFilePosition(i));
+                    accessDisk++;
                     long filePosNodo = nodo.getMyFilePosition();
                     mem.saveNode(nodo);
                     accessDisk++;
@@ -404,8 +405,8 @@ public class RTree {
      */
     public void insertaRectangulos(int nRectangles){
         for (int i=0;i<nRectangles;i++){
-            if (i%10000 == 0)
-                System.out.println("i="+i);
+            /*if (i%10000 == 0)
+                System.out.println("i="+i);*/
             Rectangulo r=generaRectangulo();
             insertar(r);
 
