@@ -28,6 +28,8 @@ public class Main {
             int rectABuscar = r/10;
             long tb1 = System.currentTimeMillis();
             for (int i=0; i<rectABuscar; i++) {
+                if (i%100 == 0)
+                    System.err.println("Buscando r="+i);
                 Rectangulo c = tree.generaRectangulo();
                 ArrayList<Rectangulo> res = tree.buscar(c);
             }
