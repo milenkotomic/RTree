@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +41,10 @@ public class Main {
             System.out.println("Tiempo de busqueda: " + tb);
             System.out.println("Accesos a disco durante busqueda: "+ accesosBusqueda);
             System.out.println("Fin\n");
+            String nameFile = "archivo.bin";
+            File f = new File(nameFile);
+            if (f.exists())
+                f.delete();
         }
     }
 }
