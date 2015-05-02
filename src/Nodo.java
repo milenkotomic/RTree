@@ -27,6 +27,7 @@ public class Nodo {
     private long myFilePosition;
     private long[] childrenFilePosition;
     private int IsLeaf;
+
     public int getIsLeaf() {
         return IsLeaf;
     }

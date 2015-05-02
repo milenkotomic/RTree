@@ -87,7 +87,7 @@ public class RTree {
                 }
                 insertar_aux(c, nodo.getMyFilePosition(), mem.loadNode(nodo.getChildFilePos(index)));
                 nodo = mem.loadNode(nodo.getMyFilePosition());
-                accessDisk++;
+                //accessDisk++;
                 parent = mem.loadNode(ref);
                 accessDisk++;
                 //revisar si hay overflow
@@ -162,7 +162,7 @@ public class RTree {
         }else{
             //Estoy en una hoja, inserto y acomodo, luego reviso si hay overflow
             nodo.addRectangulo(c, -1);
-            accessDisk++;
+            //accessDisk++;
             mem.saveNode(nodo);
             accessDisk++;
             //System.out.println("SOY HOJA " + c);
@@ -201,7 +201,7 @@ public class RTree {
             newNode.setIsLeaf(1);
         }
         Nodo newRoot = new Nodo(t, mem.getNewPosition());
-        accessDisk++;
+        //accessDisk++;
         newRoot.addRectangulo(getRaiz().getMyRectangulo(), getRaiz().getMyFilePosition());
         newRoot.addRectangulo(newNode.getMyRectangulo(), newNode.getMyFilePosition());
 
@@ -383,12 +383,16 @@ public class RTree {
      * @return un nuevo rectangulo, con area uniformente distriubida entre 1 y 100;
      */
     public Rectangulo generaRectangulo(){
-        double x1=Math.random()*500000;
-        double y1=Math.random()*500000;
+        double r1 = Math.random();
+        double r2 = Math.random();
+        double x1=r1*500000;
+        double y1=r2*500000;
         Punto p1=new Punto(x1,y1);
         double area=Math.random()*100+1;
-        double x2=Math.random()*(x1+100);
+        double x2=x1+(100*r1);
         double y2=(area/(x2-x1))+y1;
+        if (y2 > 500000)
+            y2 = 500000;
         Punto p2=new Punto(x2,y2);
         return new Rectangulo(p1,p2);
 
