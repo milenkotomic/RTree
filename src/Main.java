@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class Main {
     static public void main (String[]args) throws IOException {
-        int[] nRect = new int[]{524288, 1048576, 2097152};
+        int[] nRect = new int[]{512, 4096, 32768, 262144, 524288, 1048576, 2097152};
         for (int r: nRect) {
             RTree tree = new RTree(50);
             long t1 = System.currentTimeMillis();
