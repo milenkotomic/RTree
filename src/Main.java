@@ -32,7 +32,7 @@ public class Main {
                 Rectangulo c = tree.generaRectangulo();
                 ArrayList<Rectangulo> res = tree.buscar(c);
                 long accesosDespues = tree.accessDisk;
-                accesosPorBusqueda = ((accesosPorBusqueda * i) + (accesosDespues - accesosAntes)) / i;
+                accesosPorBusqueda = ((accesosPorBusqueda * i) + (accesosDespues - accesosAntes)) / (i+1);
             }
             long tb2 = System.currentTimeMillis();
             long tb = (tb2-tb1) / 1000;
