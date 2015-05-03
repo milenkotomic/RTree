@@ -17,7 +17,7 @@ public class MemoryManager {
 	private int numOfElements;
 	
 	public MemoryManager(int numOfBuffers, int bufferSize) throws FileNotFoundException{
-		file = new RandomAccessFile("archivo.bin", "rw");
+		file = new RandomAccessFile("rtree.bin", "rw");
 		buffer = new byte[bufferSize];
 		priority = new LinkedList<Long>();
 		elements = new HashMap<Long, Nodo>();

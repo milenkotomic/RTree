@@ -146,46 +146,5 @@ public class Rectangulo {
         return this.areaInterseccion(r) > 0;
     }
 
-    static Comparator<Rectangulo> compareAncho() {
-        return new Comparator<Rectangulo>() {
-            @Override
-            public int compare(Rectangulo rectangulo, Rectangulo rectangulo2) {
-                double ancho1=rectangulo.p1.getX()-rectangulo.p2.getX();
-                double ancho2=rectangulo2.p1.getX()-rectangulo2.p2.getX();
-                return Double.valueOf(ancho1).compareTo(Double.valueOf(ancho2));
-            }
-            // compare using attribute 1
-        };
-    }
-    static Comparator<Rectangulo> compareAlto() {
-        return new Comparator<Rectangulo>() {
-            @Override
-            public int compare(Rectangulo rectangulo, Rectangulo rectangulo2) {
-                double alto1=rectangulo.p1.getY()-rectangulo.p2.getY();
-                double alto2=rectangulo2.p1.getY()-rectangulo2.p2.getY();
-                return Double.valueOf(alto1).compareTo(Double.valueOf(alto2));
-            }
-            
-        };
-    }
 
-    public boolean isAPoint() {
-        return p1.equals(p2);
-    }
-
-
-
-
-   /* public static Comparator<? super Rectangulo> compareX2() {
-    }
-
-    public static Comparator<? super Rectangulo> compareY1() {
-    }
-
-    public static Comparator<? super Rectangulo> compareY2() {
-    }
-
-    public static Comparator<? super Rectangulo> compareX1() {
-        return null;
-    }*/
 }

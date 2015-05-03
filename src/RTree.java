@@ -17,7 +17,7 @@ public class RTree {
     protected int m;
     protected int splitCounter;
     protected int visitCount;
-    protected int accessDisk;
+    protected long accessDisk;
 
     public RTree(int t) throws FileNotFoundException {
         mem = new MemoryManager(10, 4096);
